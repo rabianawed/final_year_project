@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhishGuard AI — AI-Powered Phishing Detection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Base ── */
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:#020617;color:#e2e8f0;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+
+/* ── Variables ── */
+:root{
+  --blue:#2563EB;--purple:#7C3AED;--green:#22C55E;--red:#EF4444;--amber:#F59E0B;
+  --bg0:#020617;--bg1:#0F172A;--border:rgba(255,255,255,.08);
+  --text:#f8fafc;--muted:#64748b;--dim:#334155;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:#0F172A}
+::-webkit-scrollbar-thumb{background:#1e293b;border-radius:3px}
+
+/* ═══════════════════════════════════════════
+   NAVBAR
+═══════════════════════════════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:66px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;transition:all .3s;
+}
+nav.scrolled{
+  background:rgba(2,6,23,.92);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo-icon{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,#2563EB,#7C3AED);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 0 20px rgba(37,99,235,.4);
+}
+.nav-logo-text{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.02em}
+.nav-logo-text span{color:#60a5fa}
+.nav-links{display:flex;gap:36px}
+.nav-links a{color:#94a3b8;font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:#fff}
+.nav-cta{display:flex;gap:10px;align-items:center}
+.btn-ghost{color:#cbd5e1;font-size:14px;font-weight:500;padding:8px 16px;border-radius:9px;transition:color .2s;cursor:pointer;background:none;border:none;font-family:Inter}
+.btn-ghost:hover{color:#fff}
+.btn-primary{
+  background:linear-gradient(135deg,#2563EB,#1d4ed8);
+  color:#fff;font-size:14px;font-weight:600;padding:9px 20px;border-radius:10px;
+  border:none;cursor:pointer;font-family:Inter;
+  box-shadow:0 4px 15px rgba(37,99,235,.35);transition:all .2s;
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(37,99,235,.45)}
+.nav-mobile-btn{display:none;background:none;border:none;color:#94a3b8;cursor:pointer;font-size:22px}
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+.hero{
+  min-height:100vh;display:flex;align-items:center;
+  position:relative;overflow:hidden;padding:100px 48px 60px;
+}
+.hero-grid-bg{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(37,99,235,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(37,99,235,.055) 1px,transparent 1px);
+  background-size:52px 52px;pointer-events:none;
+}
+.hero-radial{
+  position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 90% 60% at 50% -10%,rgba(37,99,235,.22) 0%,transparent 65%);
+}
+.hero-radial2{
+  position:absolute;bottom:-200px;left:50%;transform:translateX(-50%);
+  width:800px;height:400px;pointer-events:none;
+  background:radial-gradient(ellipse,rgba(124,58,237,.12) 0%,transparent 70%);
+}
+.hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;width:100%;position:relative;z-index:2}
+.hero-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px;border-radius:99px;margin-bottom:24px;
+  border:1px solid rgba(37,99,235,.4);background:rgba(37,99,235,.1);
+  color:#60a5fa;font-size:12px;font-weight:600;letter-spacing:.02em;
+}
+.dot-pulse{width:7px;height:7px;border-radius:50%;background:#60a5fa;animation:pulse 1.6s ease-in-out infinite}
+.hero-h1{font-size:58px;font-weight:800;line-height:1.08;letter-spacing:-.03em;color:#f8fafc;margin-bottom:22px}
+.hero-h1 .grad{
+  background:linear-gradient(100deg,#3b82f6 0%,#8b5cf6 50%,#06b6d4 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-desc{color:#94a3b8;font-size:17px;line-height:1.75;margin-bottom:36px;max-width:520px}
+.hero-desc strong{color:#cbd5e1;font-weight:600}
+.scan-bar{
+  display:flex;gap:8px;margin-bottom:24px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);
+  border-radius:14px;padding:8px 8px 8px 18px;
+  transition:border-color .2s;
+}
+.scan-bar:focus-within{border-color:rgba(37,99,235,.5);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.scan-bar input{
+  flex:1;background:none;border:none;outline:none;
+  color:#f1f5f9;font-size:14px;font-family:'JetBrains Mono',monospace;
+}
+.scan-bar input::placeholder{color:#475569;font-family:Inter}
+.scan-bar-btn{
+  display:flex;align-items:center;gap:7px;padding:11px 20px;border-radius:10px;
+  background:linear-gradient(135deg,#2563EB,#1d4ed8);color:#fff;border:none;
+  font-size:14px;font-weight:600;font-family:Inter;cursor:pointer;
+  white-space:nowrap;box-shadow:0 4px 12px rgba(37,99,235,.3);transition:all .2s;
+}
+.scan-bar-btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.4)}
+.hero-checks{display:flex;gap:22px;flex-wrap:wrap}
+.hero-check{display:flex;align-items:center;gap:6px;font-size:13px;color:#475569}
+.check-icon{color:#22c55e;font-size:14px}
+
+/* ── Hero Shield Illustration ── */
+.hero-visual{position:relative;display:flex;align-items:center;justify-content:center;height:480px}
+.orbit-ring{position:absolute;border-radius:50%;top:50%;left:50%}
+.ring1{width:340px;height:340px;border:1px solid rgba(37,99,235,.18);transform:translate(-50%,-50%);animation:spin 30s linear infinite}
+.ring2{width:250px;height:250px;border:1px dashed rgba(124,58,237,.15);transform:translate(-50%,-50%);animation:spin 20s linear infinite reverse}
+.ring3{width:160px;height:160px;border:1px solid rgba(6,182,212,.12);transform:translate(-50%,-50%);animation:spin 12s linear infinite}
+.shield-core{
+  position:relative;z-index:5;width:150px;height:150px;border-radius:36px;
+  background:linear-gradient(145deg,rgba(37,99,235,.28),rgba(124,58,237,.28));
+  border:1px solid rgba(37,99,235,.5);
+  box-shadow:0 0 80px rgba(37,99,235,.3),0 0 160px rgba(37,99,235,.1),inset 0 1px 0 rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;font-size:64px;
+}
+.float-badge{
+  position:absolute;border-radius:12px;padding:10px 15px;
+  display:flex;align-items:center;gap:8px;border:1px solid;
+  backdrop-filter:blur(8px);z-index:6;animation:float 3s ease-in-out infinite;
+  white-space:nowrap;
+}
+.badge-lbl{font-size:10px;color:rgba(255,255,255,.45);margin-bottom:2px;display:block}
+.badge-val{font-size:12.5px;font-weight:700;display:block}
+.badge-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.live-status{
+  position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:7px;padding:7px 18px;border-radius:99px;
+  border:1px solid rgba(34,197,94,.3);background:rgba(34,197,94,.08);
+  color:#4ade80;font-size:12px;font-weight:500;white-space:nowrap;
+}
+
+/* ═══════════════════════════════════════════
+   STATS BAR
+═══════════════════════════════════════════ */
+.stats-bar{
+  background:#0F172A;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:64px 48px;
+}
+.stats-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.stat-item{text-align:center;padding:20px}
+.stat-val{
+  font-size:44px;font-weight:800;color:#f8fafc;letter-spacing:-.03em;margin-bottom:6px;
+  background:linear-gradient(135deg,#f8fafc,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.stat-label{font-size:12px;color:#475569;text-transform:uppercase;letter-spacing:.12em;font-weight:600}
+.stat-divider{width:1px;background:var(--border)}
+
+/* ═══════════════════════════════════════════
+   SECTION COMMONS
+═══════════════════════════════════════════ */
+section{padding:100px 48px}
+.sec-inner{max-width:1200px;margin:0 auto}
+.sec-tag{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;margin-bottom:12px}
+.sec-h2{font-size:42px;font-weight:800;color:#f8fafc;letter-spacing:-.02em;line-height:1.1;margin-bottom:16px}
+.sec-sub{color:#64748b;font-size:16px;line-height:1.75;max-width:560px}
+.text-center{text-align:center}
+.text-center .sec-sub{margin:0 auto 56px}
+
+/* ═══════════════════════════════════════════
+   FEATURES
+═══════════════════════════════════════════ */
+.features-section{background:var(--bg0)}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px}
+.feature-card{
+  border-radius:20px;border:1px solid var(--border);background:rgba(255,255,255,.025);
+  padding:28px;transition:all .3s;cursor:default;position:relative;overflow:hidden;
+}
+.feature-card::before{
+  content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s;
+  background:radial-gradient(circle at top left,rgba(255,255,255,.04),transparent 60%);
+}
+.feature-card:hover{border-color:rgba(255,255,255,.14);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.3)}
+.feature-card:hover::before{opacity:1}
+.feature-icon{
+  width:48px;height:48px;border-radius:14px;display:flex;align-items:center;
+  justify-content:center;margin-bottom:18px;font-size:22px;border:1px solid;
+  transition:transform .3s;
+}
+.feature-card:hover .feature-icon{transform:scale(1.1)}
+.feature-title{font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:8px}
+.feature-desc{font-size:14px;color:#64748b;line-height:1.7}
+
+/* ═══════════════════════════════════════════
+   HOW IT WORKS
+═══════════════════════════════════════════ */
+.how-section{background:#0F172A}
+.how-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.steps{display:flex;flex-direction:column;gap:28px;margin-top:32px}
+.step{display:flex;gap:18px;align-items:flex-start}
+.step-num{
+  flex-shrink:0;width:42px;height:42px;border-radius:13px;
+  background:rgba(37,99,235,.14);border:1px solid rgba(37,99,235,.35);
+  color:#60a5fa;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;
+}
+.step-title{font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:5px}
+.step-desc{font-size:13.5px;color:#64748b;line-height:1.65}
+
+/* Terminal */
+.terminal{border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.08);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.term-bar{
+  display:flex;align-items:center;gap:7px;padding:13px 18px;
+  background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.06);
+}
+.term-dot{width:12px;height:12px;border-radius:50%}
+.term-title{margin-left:8px;font-size:11.5px;color:#475569;font-family:'JetBrains Mono',monospace}
+.term-body{padding:22px;background:#070d1a;display:flex;flex-direction:column;gap:5px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.8}
+.t-cmd{color:#475569}
+.t-blue{color:#60a5fa}
+.t-dim{color:#334155;padding-left:16px}
+.t-verdict{
+  margin-top:10px;padding:12px 16px;border-radius:10px;
+  background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.3);
+}
+.t-v-main{color:#f87171;font-weight:700;font-size:13px}
+.t-v-sub{color:rgba(248,113,113,.55);font-size:11px;margin-top:3px}
+.t-done{color:rgba(74,222,128,.5);font-size:11px;margin-top:8px}
+
+/* ═══════════════════════════════════════════
+   WHY US
+═══════════════════════════════════════════ */
+.why-section{background:var(--bg0)}
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:56px}
+.why-card{
+  display:flex;gap:14px;padding:20px;border-radius:16px;
+  border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02);
+  transition:border-color .25s,transform .25s;
+}
+.why-card:hover{border-color:rgba(255,255,255,.15);transform:translateY(-2px)}
+.why-icon{
+  width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-size:17px;flex-shrink:0;border:1px solid;margin-top:1px;
+}
+.why-title{font-size:14px;font-weight:700;color:#f1f5f9;margin-bottom:5px}
+.why-desc{font-size:13px;color:#64748b;line-height:1.6}
+
+/* ═══════════════════════════════════════════
+   TESTIMONIALS
+═══════════════════════════════════════════ */
+.testi-section{background:#0F172A}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:56px}
+.testi-card{
+  border-radius:20px;border:1px solid var(--border);background:rgba(255,255,255,.025);
+  padding:26px;backdrop-filter:blur(4px);transition:border-color .25s,transform .25s;
+}
+.testi-card:hover{border-color:rgba(255,255,255,.14);transform:translateY(-3px)}
+.stars{color:#fbbf24;font-size:15px;margin-bottom:14px;letter-spacing:2px}
+.testi-text{font-size:14px;color:#94a3b8;line-height:1.75;margin-bottom:20px}
+.testi-author{display:flex;align-items:center;gap:12px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)}
+.testi-avatar{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#2563EB,#7C3AED);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;
+}
+.testi-name{font-size:13.5px;font-weight:600;color:#f1f5f9}
+.testi-role{font-size:12px;color:#475569}
+
+/* ═══════════════════════════════════════════
+   PRICING
+═══════════════════════════════════════════ */
+.pricing-section{background:var(--bg0)}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:56px;align-items:start}
+.pricing-card{
+  border-radius:22px;padding:28px;border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.025);position:relative;transition:all .25s;
+}
+.pricing-card:hover{border-color:rgba(255,255,255,.14);transform:translateY(-3px)}
+.pricing-card.highlight{
+  background:rgba(37,99,235,.1);border-color:rgba(37,99,235,.45);
+  box-shadow:0 0 60px rgba(37,99,235,.15);
+}
+.popular-pill{
+  position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,#2563EB,#7C3AED);color:#fff;
+  font-size:11px;font-weight:700;padding:5px 16px;border-radius:99px;white-space:nowrap;
+  box-shadow:0 4px 12px rgba(37,99,235,.4);
+}
+.plan-name{font-size:12px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.plan-price{display:flex;align-items:baseline;gap:3px;margin-bottom:6px}
+.plan-price-val{font-size:42px;font-weight:800;color:#f8fafc;letter-spacing:-.03em}
+.plan-price-period{font-size:13px;color:#475569}
+.plan-desc{font-size:13px;color:#64748b;margin:10px 0 22px;line-height:1.55}
+.plan-btn{
+  width:100%;padding:12px;border-radius:12px;font-size:14px;font-weight:600;
+  font-family:Inter;cursor:pointer;border:none;margin-bottom:22px;transition:all .2s;
+}
+.plan-btn-primary{background:linear-gradient(135deg,#2563EB,#1d4ed8);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.3)}
+.plan-btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.4)}
+.plan-btn-ghost{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#e2e8f0}
+.plan-btn-ghost:hover{background:rgba(255,255,255,.1)}
+.plan-features{display:flex;flex-direction:column;gap:10px}
+.plan-feat{display:flex;align-items:center;gap:9px;font-size:13.5px;color:#94a3b8}
+.feat-check{color:#4ade80;font-size:14px;flex-shrink:0}
+
+/* ═══════════════════════════════════════════
+   FAQ
+═══════════════════════════════════════════ */
+.faq-section{background:#0F172A}
+.faq-wrap{max-width:760px;margin:56px auto 0;border-radius:20px;border:1px solid var(--border);background:rgba(255,255,255,.025);overflow:hidden}
+.faq-item{border-bottom:1px solid rgba(255,255,255,.06)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  padding:20px 24px;background:none;border:none;cursor:pointer;gap:16px;text-align:left;
+}
+.faq-q-text{font-size:15px;font-weight:600;color:#f1f5f9;transition:color .2s}
+.faq-q:hover .faq-q-text{color:#60a5fa}
+.faq-arrow{color:#475569;font-size:18px;flex-shrink:0;transition:transform .3s;user-select:none}
+.faq-arrow.open{transform:rotate(180deg)}
+.faq-a{
+  max-height:0;overflow:hidden;transition:max-height .35s ease, opacity .3s ease;opacity:0;
+}
+.faq-a.open{max-height:200px;opacity:1}
+.faq-a p{padding:0 24px 20px;font-size:14px;color:#64748b;line-height:1.75}
+
+/* ═══════════════════════════════════════════
+   CTA BANNER
+═══════════════════════════════════════════ */
+.cta-section{background:var(--bg0);padding:80px 48px}
+.cta-inner{
+  max-width:900px;margin:0 auto;border-radius:28px;padding:72px;
+  border:1px solid rgba(37,99,235,.2);position:relative;overflow:hidden;text-align:center;
+  background:linear-gradient(145deg,rgba(37,99,235,.1),rgba(124,58,237,.1));
+}
+.cta-glow{
+  position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 60% 50% at 50% -10%,rgba(37,99,235,.25),transparent);
+}
+.cta-glow2{
+  position:absolute;bottom:-100px;left:50%;transform:translateX(-50%);
+  width:600px;height:300px;pointer-events:none;
+  background:radial-gradient(ellipse,rgba(124,58,237,.12),transparent 70%);
+}
+.cta-icon{
+  width:64px;height:64px;border-radius:20px;
+  background:rgba(37,99,235,.2);border:1px solid rgba(37,99,235,.4);
+  display:flex;align-items:center;justify-content:center;font-size:30px;
+  margin:0 auto 22px;box-shadow:0 0 30px rgba(37,99,235,.2);
+}
+.cta-h2{font-size:38px;font-weight:800;color:#f8fafc;letter-spacing:-.02em;margin-bottom:14px}
+.cta-p{color:#94a3b8;font-size:16px;margin-bottom:32px;line-height:1.7;max-width:520px;margin-left:auto;margin-right:auto}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-cta-a{
+  display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:13px;
+  background:linear-gradient(135deg,#2563EB,#1d4ed8);color:#fff;font-size:15px;font-weight:700;
+  border:none;cursor:pointer;font-family:Inter;
+  box-shadow:0 6px 20px rgba(37,99,235,.35);transition:all .2s;
+}
+.btn-cta-a:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(37,99,235,.45)}
+.btn-cta-b{
+  display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:13px;
+  border:1px solid rgba(255,255,255,.14);color:#cbd5e1;font-size:15px;font-weight:600;
+  background:rgba(255,255,255,.04);cursor:pointer;font-family:Inter;transition:all .2s;
+}
+.btn-cta-b:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.08)}
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+footer{background:#0F172A;border-top:1px solid var(--border);padding:70px 48px 32px}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:50px;margin-bottom:52px}
+.footer-brand p{font-size:13px;color:#475569;line-height:1.7;margin:14px 0 20px;max-width:240px}
+.footer-social{display:flex;gap:8px}
+.social-btn{
+  width:34px;height:34px;border-radius:10px;border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.03);color:#64748b;font-size:14px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:all .2s;font-family:Inter;
+}
+.social-btn:hover{color:#fff;border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.07)}
+.footer-col h4{font-size:12px;font-weight:700;color:#e2e8f0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-col a{font-size:13.5px;color:#475569;transition:color .2s}
+.footer-col a:hover{color:#94a3b8}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.055);padding-top:26px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.footer-copy{font-size:12px;color:#334155}
+.footer-status{display:flex;align-items:center;gap:7px;padding:5px 14px;border-radius:99px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);color:#4ade80;font-size:11.5px;font-weight:500}
+.footer-status .dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite}
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════ */
+@keyframes spin{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes float{0%,100%{transform:translate(-50%,-50%) translateY(0px)}50%{transform:translate(-50%,-50%) translateY(-9px)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.fade-up{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media(max-width:960px){
+  .hero-inner,.how-inner{grid-template-columns:1fr}
+  .hero-visual{height:280px;margin-top:0;order:-1}
+  .features-grid,.testi-grid,.pricing-grid{grid-template-columns:1fr}
+  .why-grid{grid-template-columns:1fr 1fr}
+  .footer-top{grid-template-columns:1fr 1fr}
+  .stats-inner{grid-template-columns:1fr 1fr}
+  .stat-divider{display:none}
+  .nav-links,.nav-cta{display:none}
+  .nav-mobile-btn{display:block}
+  section{padding:70px 24px}
+  nav{padding:0 24px}
+  .hero{padding:90px 24px 50px}
+  .hero-h1{font-size:40px}
+  .sec-h2{font-size:32px}
+  .cta-inner{padding:48px 28px}
+  .cta-h2{font-size:28px}
+  footer{padding:50px 24px 28px}
+  .footer-top{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════ -->
+<nav id="navbar">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">🛡</div>
+    <div class="nav-logo-text">Phish<span>Guard</span></div>
+  </div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <div class="nav-cta">
+    <button class="btn-ghost">Sign in</button>
+    <button class="btn-primary">Get started free</button>
+  </div>
+  <button class="nav-mobile-btn" onclick="alert('Mobile menu')">☰</button>
+</nav>
+
+<!-- ════════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<section class="hero" id="home">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-radial"></div>
+  <div class="hero-radial2"></div>
+
+  <div class="hero-inner">
+    <!-- Left: Copy -->
+    <div style="animation:fadeUp .8s ease both">
+      <div class="hero-pill">
+        <div class="dot-pulse"></div>
+        AI-Powered Threat Detection — v2.0
+      </div>
+      <h1 class="hero-h1">
+        Stop phishing<br>
+        <span class="grad">before it lands</span>
+      </h1>
+      <p class="hero-desc">
+        PhishGuard uses ensemble machine learning and transformer-based NLP
+        to detect phishing in URLs, emails, and websites — with
+        <strong>99.2% accuracy</strong> and sub-second response times.
+      </p>
+
+      <div class="scan-bar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <input id="heroInput" type="text" placeholder="Paste a suspicious URL to scan instantly...">
+        <button class="scan-bar-btn" onclick="heroScan()">
+          Scan
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <div class="hero-checks">
+        <div class="hero-check"><span class="check-icon">✓</span> No sign-up required</div>
+        <div class="hero-check"><span class="check-icon">✓</span> Free 50 scans/month</div>
+        <div class="hero-check"><span class="check-icon">✓</span> GDPR compliant</div>
+      </div>
+    </div>
+
+    <!-- Right: Shield Visual -->
+    <div class="hero-visual" style="animation:fadeIn 1.2s ease both">
+      <div class="orbit-ring ring1"></div>
+      <div class="orbit-ring ring2"></div>
+      <div class="orbit-ring ring3"></div>
+
+      <div class="shield-core">🛡️</div>
+
+      <!-- Floating badges -->
+      <div class="float-badge" style="top:18%;left:0%;background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.35);animation-delay:0s;transform:translate(-50%,-50%);left:80%;top:22%">
+        <div class="badge-dot" style="background:#ef4444"></div>
+        <div><span class="badge-lbl">URL Scanned</span><span class="badge-val" style="color:#f87171">⚠ Phishing</span></div>
+      </div>
+      <div class="float-badge" style="background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.35);animation-delay:.7s;left:8%;top:25%">
+        <div class="badge-dot" style="background:#22c55e"></div>
+        <div><span class="badge-lbl">Safe URL</span><span class="badge-val" style="color:#4ade80">✓ Verified</span></div>
+      </div>
+      <div class="float-badge" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.35);animation-delay:1.2s;left:75%;top:73%">
+        <div class="badge-dot" style="background:#f59e0b"></div>
+        <div><span class="badge-lbl">SSL Status</span><span class="badge-val" style="color:#fbbf24">⚠ Expired</span></div>
+      </div>
+      <div class="float-badge" style="background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.35);animation-delay:.4s;left:5%;top:72%">
+        <div class="badge-dot" style="background:#22c55e"></div>
+        <div><span class="badge-lbl">Risk Score</span><span class="badge-val" style="color:#4ade80">3 / 100</span></div>
+      </div>
+
+      <div class="live-status">
+        <div class="dot-pulse"></div>
+        Scanning in real-time
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     STATS BAR
+════════════════════════════════════════ -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item fade-up">
+      <div class="stat-val">99.2%</div>
+      <div class="stat-label">Detection Accuracy</div>
+    </div>
+    <div class="stat-item fade-up" style="transition-delay:.1s">
+      <div class="stat-val">&lt; 2s</div>
+      <div class="stat-label">Avg. Scan Time</div>
+    </div>
+    <div class="stat-item fade-up" style="transition-delay:.2s">
+      <div class="stat-val">12M+</div>
+      <div class="stat-label">URLs Analyzed</div>
+    </div>
+    <div class="stat-item fade-up" style="transition-delay:.3s">
+      <div class="stat-val">340K</div>
+      <div class="stat-label">Threats Blocked</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     FEATURES
+════════════════════════════════════════ -->
+<section class="features-section" id="features">
+  <div class="sec-inner">
+    <div class="text-center fade-up">
+      <div class="sec-tag" style="color:#60a5fa">What we detect</div>
+      <h2 class="sec-h2">Three attack vectors.<br>One platform.</h2>
+      <p class="sec-sub">Phishing attacks evolve every day. Our multi-modal AI stays ahead by analyzing threats across every channel attackers use.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card fade-up">
+        <div class="feature-icon" style="background:rgba(37,99,235,.12);color:#60a5fa;border-color:rgba(37,99,235,.3)">🔗</div>
+        <div class="feature-title">URL Analysis</div>
+        <div class="feature-desc">Detect malicious URLs in real-time using ML models trained on millions of phishing patterns and 200+ behavioral signals extracted per URL.</div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:.08s">
+        <div class="feature-icon" style="background:rgba(139,92,246,.12);color:#a78bfa;border-color:rgba(139,92,246,.3)">✉️</div>
+        <div class="feature-title">Email Scanning</div>
+        <div class="feature-desc">Analyze email headers, body content, and embedded links for phishing indicators with our NLP-powered transformer classifier.</div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:.16s">
+        <div class="feature-icon" style="background:rgba(34,197,94,.12);color:#4ade80;border-color:rgba(34,197,94,.3)">🌐</div>
+        <div class="feature-title">Website Detection</div>
+        <div class="feature-desc">Live website scanning with headless screenshot analysis, SSL validation, domain reputation scoring, and visual impersonation detection.</div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:.24s">
+        <div class="feature-icon" style="background:rgba(245,158,11,.12);color:#fbbf24;border-color:rgba(245,158,11,.3)">🧠</div>
+        <div class="feature-title">AI Explanations</div>
+        <div class="feature-desc">Every detection includes human-readable AI reasoning with feature attribution so analysts understand exactly why a threat was flagged.</div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:.32s">
+        <div class="feature-icon" style="background:rgba(239,68,68,.12);color:#f87171;border-color:rgba(239,68,68,.3)">📊</div>
+        <div class="feature-title">Threat Intelligence</div>
+        <div class="feature-desc">Access a continuously updated database of known malicious domains, IPs, and attack campaigns from 40+ global intelligence feeds.</div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:.4s">
+        <div class="feature-icon" style="background:rgba(14,165,233,.12);color:#38bdf8;border-color:rgba(14,165,233,.3)">🧩</div>
+        <div class="feature-title">Browser Extension</div>
+        <div class="feature-desc">Protect yourself in real-time with our Chrome, Firefox, and Edge extension that silently scans every page with zero performance impact.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     HOW IT WORKS
+════════════════════════════════════════ -->
+<section class="how-section" id="how-it-works">
+  <div class="sec-inner">
+    <div class="how-inner">
+      <div class="fade-up">
+        <div class="sec-tag" style="color:#a78bfa">Under the hood</div>
+        <h2 class="sec-h2">How the AI<br>detects threats</h2>
+        <p style="color:#64748b;font-size:14.5px;line-height:1.75;margin-bottom:8px">Our pipeline combines feature engineering, ensemble classifiers, and transformer-based language models to achieve industry-leading accuracy.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">01</div>
+            <div><div class="step-title">Submit Content</div><div class="step-desc">Paste a URL, upload an .eml file, or enter a website URL. Our REST API accepts all three threat vectors simultaneously.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-num">02</div>
+            <div><div class="step-title">AI Analysis</div><div class="step-desc">Our ensemble of ML models — XGBoost, Random Forest, and BERT-phish — analyze 200+ features in parallel.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-num">03</div>
+            <div><div class="step-title">Threat Scoring</div><div class="step-desc">Each submission receives a risk score from 0–100 with confidence intervals and per-feature attribution weights.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-num">04</div>
+            <div><div class="step-title">Actionable Report</div><div class="step-desc">Get a detailed breakdown of detected indicators, severity level, and recommended actions in under 2 seconds.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Terminal -->
+      <div class="terminal fade-up" style="transition-delay:.2s">
+        <div class="term-bar">
+          <div class="term-dot" style="background:#ef444499"></div>
+          <div class="term-dot" style="background:#f59e0b99"></div>
+          <div class="term-dot" style="background:#22c55e99"></div>
+          <div class="term-title">phishguard — analysis output</div>
+        </div>
+        <div class="term-body">
+          <div class="t-cmd">$ phishguard analyze --url "http://secure-bank-login.xyz/verify"</div>
+          <div style="margin-top:6px">
+            <div class="t-blue">→ Extracting 212 features...</div>
+            <div class="t-dim">lexical: suspicious TLD, hyphenation score 0.87</div>
+            <div class="t-dim">domain: age 3 days, no WHOIS privacy</div>
+            <div class="t-dim">NLP: urgency keywords detected (3/5)</div>
+            <div class="t-dim">visual: brand impersonation score 0.91</div>
+            <div style="margin-top:4px" class="t-blue">→ Running ensemble classifiers...</div>
+            <div class="t-dim">XGBoost: <span style="color:#f87171">0.97</span> phishing probability</div>
+            <div class="t-dim">BERT-phish: <span style="color:#f87171">0.94</span> phishing probability</div>
+            <div class="t-dim">Random Forest: <span style="color:#f87171">0.99</span> phishing probability</div>
+          </div>
+          <div class="t-verdict">
+            <div class="t-v-main">⚠ VERDICT: PHISHING — HIGH RISK</div>
+            <div class="t-v-sub">Confidence: 96.7% · Risk Score: 94/100 · 3 models agree</div>
+          </div>
+          <div class="t-done">✓ Scan completed in 847ms</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     WHY US
+════════════════════════════════════════ -->
+<section class="why-section">
+  <div class="sec-inner">
+    <div class="text-center fade-up">
+      <div class="sec-tag" style="color:#4ade80">Why PhishGuard</div>
+      <h2 class="sec-h2">Designed for<br>security professionals</h2>
+      <p class="sec-sub">We built the tool we always wanted — fast, accurate, explainable, and built to slot into any security workflow.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card fade-up"><div class="why-icon" style="background:rgba(34,197,94,.1);color:#4ade80;border-color:rgba(34,197,94,.25)">⚙️</div><div><div class="why-title">Ensemble ML architecture</div><div class="why-desc">XGBoost, Random Forest, and BERT working in parallel — not just a single model.</div></div></div>
+      <div class="why-card fade-up" style="transition-delay:.07s"><div class="why-icon" style="background:rgba(34,197,94,.1);color:#4ade80;border-color:rgba(34,197,94,.25)">⚡</div><div><div class="why-title">Real-time scoring</div><div class="why-desc">Sub-second results even on complex website scans with live screenshot analysis.</div></div></div>
+      <div class="why-card fade-up" style="transition-delay:.14s"><div class="why-icon" style="background:rgba(34,197,94,.1);color:#4ade80;border-color:rgba(34,197,94,.25)">👁️</div><div><div class="why-title">Explainable AI</div><div class="why-desc">Every result includes feature attribution so analysts understand the reasoning.</div></div></div>
+      <div class="why-card fade-up" style="transition-delay:.21s"><div class="why-icon" style="background:rgba(34,197,94,.1);color:#4ade80;border-color:rgba(34,197,94,.25)">🔒</div><div><div class="why-title">Privacy by design</div><div class="why-desc">Content analyzed in memory and never persisted without your explicit consent.</div></div></div>
+      <div class="why-card fade-up" style="transition-delay:.28s"><div class="why-icon" style="background:rgba(34,197,94,.1);color:#4ade80;border-color:rgba(34,197,94,.25)">📈</div><div><div class="why-title">Continuously updated</div><div class="why-desc">Threat intelligence feeds refresh every 15 minutes from 40+ global sources.</div></div></div>
+      <div class="why-card fade-up" style="transition-delay:.35s"><div class="why-icon" style="background:rgba(34,197,94,.1);color:#4ade80;border-color:rgba(34,197,94,.25)">👥</div><div><div class="why-title">Built for teams</div><div class="why-desc">Role-based access, shared dashboards, audit logs, and SSO out of the box.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     TESTIMONIALS
+════════════════════════════════════════ -->
+<section class="testi-section">
+  <div class="sec-inner">
+    <div class="text-center fade-up">
+      <div class="sec-tag" style="color:#fbbf24">What users say</div>
+      <h2 class="sec-h2">Trusted by security<br>teams worldwide</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card fade-up">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">"PhishGuard caught a sophisticated spear-phishing campaign targeting our CFO. The AI explanation made it trivial to brief our board on the threat."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">SC</div>
+          <div><div class="testi-name">Sarah Chen</div><div class="testi-role">CISO, FinanceFirst Ltd.</div></div>
+        </div>
+      </div>
+      <div class="testi-card fade-up" style="transition-delay:.1s">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">"We integrated the API in two hours. The threat intelligence feed alone replaced two other tools we were paying for separately."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">MW</div>
+          <div><div class="testi-name">Marcus Webb</div><div class="testi-role">SOC Analyst, CyberShield MSSP</div></div>
+        </div>
+      </div>
+      <div class="testi-card fade-up" style="transition-delay:.2s">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">"The browser extension is invisible when safe and impossible to miss when dangerous. Perfect balance for a university environment."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">PS</div>
+          <div><div class="testi-name">Priya Sharma</div><div class="testi-role">IT Security Lead, EduTech Global</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     PRICING
+════════════════════════════════════════ -->
+<section class="pricing-section" id="pricing">
+  <div class="sec-inner">
+    <div class="text-center fade-up">
+      <div class="sec-tag" style="color:#60a5fa">Pricing</div>
+      <h2 class="sec-h2">Start free,<br>scale when you need to</h2>
+      <p class="sec-sub" style="margin-bottom:0">No credit card required for the free plan.</p>
+    </div>
+    <div class="pricing-grid">
+      <!-- Free -->
+      <div class="pricing-card fade-up">
+        <div class="plan-name">Free</div>
+        <div class="plan-price"><span class="plan-price-val">$0</span><span class="plan-price-period">/ forever</span></div>
+        <div class="plan-desc">For individuals and students exploring phishing detection.</div>
+        <button class="plan-btn plan-btn-ghost">Get started free</button>
+        <div class="plan-features">
+          <div class="plan-feat"><span class="feat-check">✓</span>50 URL scans / month</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>10 email scans / month</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Basic risk scoring</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Community threat intel</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Browser extension</div>
+        </div>
+      </div>
+      <!-- Pro -->
+      <div class="pricing-card highlight fade-up" style="transition-delay:.1s">
+        <div class="popular-pill">✦ Most popular</div>
+        <div class="plan-name" style="color:#93c5fd">Pro</div>
+        <div class="plan-price"><span class="plan-price-val">$29</span><span class="plan-price-period">/ per month</span></div>
+        <div class="plan-desc">For security professionals who need full-featured detection.</div>
+        <button class="plan-btn plan-btn-primary">Start 14-day trial</button>
+        <div class="plan-features">
+          <div class="plan-feat"><span class="feat-check">✓</span>Unlimited URL scans</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>500 email scans / month</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>AI explanations</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>PDF / CSV reports</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>API access (10K calls/mo)</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Priority threat intel feed</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Website live scanner</div>
+        </div>
+      </div>
+      <!-- Enterprise -->
+      <div class="pricing-card fade-up" style="transition-delay:.2s">
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-price"><span class="plan-price-val" style="font-size:32px">Custom</span></div>
+        <div class="plan-desc">For teams and MSSPs requiring high-volume, white-label solutions.</div>
+        <button class="plan-btn plan-btn-ghost">Contact sales</button>
+        <div class="plan-features">
+          <div class="plan-feat"><span class="feat-check">✓</span>Unlimited everything</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>SLA-backed uptime</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>SSO / SAML integration</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Dedicated ML model tuning</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Custom threat feeds</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>On-prem deployment option</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>24/7 dedicated support</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     FAQ
+════════════════════════════════════════ -->
+<section class="faq-section" id="faq">
+  <div class="sec-inner">
+    <div class="text-center fade-up">
+      <div class="sec-tag" style="color:#a78bfa">FAQ</div>
+      <h2 class="sec-h2">Common questions</h2>
+    </div>
+    <div class="faq-wrap">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(0)">
+          <span class="faq-q-text">How accurate is the AI detection?</span>
+          <span class="faq-arrow" id="arr0">▾</span>
+        </button>
+        <div class="faq-a" id="faq0"><p>Our ensemble model achieves 99.2% accuracy on our benchmark dataset of 2M labeled URLs, 500K emails, and 300K websites. False positive rate is under 0.4%.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(1)">
+          <span class="faq-q-text">How long does a scan take?</span>
+          <span class="faq-arrow" id="arr1">▾</span>
+        </button>
+        <div class="faq-a" id="faq1"><p>URL scans complete in under 1 second. Email analysis takes 2–5 seconds depending on content length. Website scans with live screenshots average 8 seconds.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(2)">
+          <span class="faq-q-text">Is my data stored or shared?</span>
+          <span class="faq-arrow" id="arr2">▾</span>
+        </button>
+        <div class="faq-a" id="faq2"><p>Submitted content is processed in memory and not stored beyond the session unless you explicitly save a report. We never share your data with third parties.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(3)">
+          <span class="faq-q-text">Can I integrate PhishGuard with my SIEM?</span>
+          <span class="faq-arrow" id="arr3">▾</span>
+        </button>
+        <div class="faq-a" id="faq3"><p>Yes. Our REST API supports webhooks, JSON, and CSV exports. Enterprise plans include native SIEM connectors for Splunk, Microsoft Sentinel, and IBM QRadar.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(4)">
+          <span class="faq-q-text">Does the browser extension work on all browsers?</span>
+          <span class="faq-arrow" id="arr4">▾</span>
+        </button>
+        <div class="faq-a" id="faq4"><p>The extension is available for Chrome, Firefox, and Edge. Safari support is in beta. It scans pages passively with no performance impact on your browsing speed.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     CTA BANNER
+════════════════════════════════════════ -->
+<div class="cta-section">
+  <div class="cta-inner fade-up">
+    <div class="cta-glow"></div>
+    <div class="cta-glow2"></div>
+    <div style="position:relative;z-index:2">
+      <div class="cta-icon">🛡️</div>
+      <h2 class="cta-h2">Start protecting yourself today</h2>
+      <p class="cta-p">Join thousands of security professionals using PhishGuard to stay one step ahead of attackers. Free forever, no credit card needed.</p>
+      <div class="cta-btns">
+        <button class="btn-cta-a">Create free account →</button>
+        <button class="btn-cta-b">View live demo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="nav-logo" style="margin-bottom:0">
+          <div class="nav-logo-icon">🛡</div>
+          <div class="nav-logo-text">Phish<span>Guard</span></div>
+        </div>
+        <p>AI-powered phishing detection for URLs, emails, and websites. Built as a Final Year Project.</p>
+        <div class="footer-social">
+          <button class="social-btn">GH</button>
+          <button class="social-btn">TW</button>
+          <button class="social-btn">LI</button>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#">URL Scanner</a></li>
+          <li><a href="#">Email Scanner</a></li>
+          <li><a href="#">Website Scanner</a></li>
+          <li><a href="#">Threat Intel</a></li>
+          <li><a href="#">Browser Extension</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Cookie Policy</a></li>
+          <li><a href="#">Security</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 PhishGuard AI. All rights reserved. — Final Year Project</div>
+      <div class="footer-status">
+        <div class="dot"></div>
+        All systems operational
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── Navbar scroll ── */
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+/* ── Intersection Observer for fade-up ── */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+/* ── FAQ accordion ── */
+let openFaq = null;
+function toggleFaq(i) {
+  const faq = document.getElementById('faq' + i);
+  const arr = document.getElementById('arr' + i);
+  const isOpen = faq.classList.contains('open');
+  // close all
+  for (let j = 0; j < 5; j++) {
+    document.getElementById('faq' + j)?.classList.remove('open');
+    document.getElementById('arr' + j)?.classList.remove('open');
+  }
+  if (!isOpen) { faq.classList.add('open'); arr.classList.add('open'); }
+}
+
+/* ── Hero scan simulation ── */
+function heroScan() {
+  const val = document.getElementById('heroInput').value.trim();
+  if (!val) { document.getElementById('heroInput').focus(); return; }
+
+  const btn = document.querySelector('.scan-bar-btn');
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" style="animation:spin 0.7s linear infinite;transform-origin:center;display:block"/></svg> Scanning...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    const isPhish = /secure|verify|login|bank|claim|reward|suspicious/i.test(val) && !/github|stripe|google/i.test(val);
+    const verdict = isPhish ? '⚠ PHISHING DETECTED — Risk 94/100' : '✓ SAFE — Risk 3/100';
+    const color = isPhish ? '#EF4444' : '#22C55E';
+
+    // Show toast result
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+      position:fixed;bottom:32px;right:32px;z-index:999;
+      padding:16px 24px;border-radius:14px;border:1px solid ${isPhish ? 'rgba(239,68,68,.4)' : 'rgba(34,197,94,.4)'};
+      background:${isPhish ? 'rgba(239,68,68,.12)' : 'rgba(34,197,94,.12)'};
+      color:${color};font-size:14px;font-weight:700;font-family:Inter,sans-serif;
+      box-shadow:0 20px 40px rgba(0,0,0,.5);animation:fadeUp .4s ease both;
+      display:flex;align-items:center;gap:10px;max-width:340px;
+    `;
+    toast.innerHTML = `<span style="font-size:20px">${isPhish ? '⚠' : '✓'}</span><div><div>${verdict}</div><div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:2px;font-weight:400">${val}</div></div>`;
+    document.body.appendChild(toast);
+
+    btn.innerHTML = 'Scan →';
+    btn.disabled = false;
+
+    setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .4s'; setTimeout(() => toast.remove(), 400); }, 4000);
+  }, 1600);
+}
+
+document.getElementById('heroInput').addEventListener('keydown', e => { if (e.key === 'Enter') heroScan(); });
+
+/* ── Smooth scroll for nav links ── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>
