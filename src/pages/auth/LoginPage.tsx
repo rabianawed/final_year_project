@@ -5,11 +5,13 @@
  */
 
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Shield, Mail, Lock, Eye, EyeOff, AlertCircle,
   Github, Chrome, ArrowRight, CheckCircle2, ShieldCheck,
   Zap, Globe, Link2
 } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -23,18 +25,6 @@ interface FormErrors {
   email?: string;
   password?: string;
   general?: string;
-}
-
-// ─── Dummy auth (replace with real API call via authService) ──────────────────
-
-const DEMO_CREDENTIALS = { email: "demo@phishguard.ai", password: "demo1234" };
-
-async function fakeLogin(email: string, password: string): Promise<{ success: boolean; message?: string }> {
-  await new Promise((r) => setTimeout(r, 1200));
-  if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
-    return { success: true };
-  }
-  return { success: false, message: "Invalid email or password." };
 }
 
 // ─── Validation ────────────────────────────────────────────────────────────────
@@ -308,6 +298,8 @@ const SocialBtn: React.FC<{ icon: React.ReactNode; label: string; onClick: () =>
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [form, setForm] = useState<FormState>({ email: "", password: "", rememberMe: false });
   const [errors, setErrors] = useState<FormErrors>({});
   const [showPass, setShowPass] = useState(false);
@@ -329,15 +321,14 @@ const LoginPage: React.FC = () => {
 
     setLoading(true);
     setErrors({});
-    const result = await fakeLogin(form.email, form.password);
+    const ok = await login(form.email, form.password);
     setLoading(false);
 
-    if (result.success) {
+    if (ok) {
       setSuccess(true);
-      // Navigate to dashboard after short delay
-      setTimeout(() => { window.location.href = "/dashboard"; }, 1200);
+      setTimeout(() => navigate("/dashboard"), 900);
     } else {
-      setErrors({ general: result.message });
+      setErrors({ general: "Invalid email or password. Use any email with 6+ character password." });
       setShake(true);
       setTimeout(() => setShake(false), 500);
     }
@@ -421,7 +412,7 @@ const LoginPage: React.FC = () => {
           >
             <Zap size={13} color="#60a5fa" style={{ marginTop: 1, flexShrink: 0 }} />
             <p style={{ color: "#93c5fd", fontSize: 12, lineHeight: 1.55 }}>
-              <strong>Demo credentials:</strong> demo@phishguard.ai / demo1234
+              <strong>Demo:</strong> any email + password (6+ chars). Try demo@phishguard.ai / demo1234
             </p>
           </div>
 
@@ -515,14 +506,13 @@ const LoginPage: React.FC = () => {
               </div>
               <span style={{ color: "#94a3b8", fontSize: 13 }}>Remember me</span>
             </label>
-            <a
-              href="/forgot-password"
-              style={{ color: "#60a5fa", fontSize: 13, textDecoration: "none" }}
-              onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
-              onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
+            <button
+              type="button"
+              onClick={() => alert("Password reset is not configured in this demo. Use any email with a 6+ character password to sign in.")}
+              style={{ color: "#60a5fa", fontSize: 13, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}
             >
               Forgot password?
-            </a>
+            </button>
           </div>
 
           {/* Submit button */}
@@ -581,7 +571,7 @@ const LoginPage: React.FC = () => {
             <SocialBtn
               icon={<Github size={16} />}
               label="GitHub"
-              onClick={() => console.log("GitHub OAuth")}
+              onClick={() => window.open("https://github.com/rabianawed/final_year_project", "_blank", "noopener")}
             />
             <SocialBtn
               icon={<Chrome size={16} />}
@@ -593,14 +583,14 @@ const LoginPage: React.FC = () => {
           {/* Register link */}
           <p style={{ textAlign: "center", color: "#475569", fontSize: 13 }}>
             Don't have an account?{" "}
-            <a
-              href="/register"
+            <Link
+              to="/register"
               style={{ color: "#60a5fa", textDecoration: "none", fontWeight: 500 }}
               onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
               onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
             >
               Create one free
-            </a>
+            </Link>
           </p>
         </div>
 

@@ -4,7 +4,8 @@
  * Large input, scan button, loading animation, results with confidence/risk/AI explanation, recent history
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Link2, Search, ShieldCheck, ShieldAlert, AlertTriangle, Clock,
   Brain, Activity, ExternalLink, Loader2
@@ -101,9 +102,15 @@ const RiskMeter: React.FC<{ score: number; color: string }> = ({ score, color })
 };
 
 const URLScannerPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const [url, setUrl] = useState("");
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
+
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q) setUrl(q);
+  }, [searchParams]);
 
   const handleScan = async () => {
     if (!url.trim()) return;

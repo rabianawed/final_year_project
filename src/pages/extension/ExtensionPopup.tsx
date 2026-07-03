@@ -4,6 +4,7 @@
  * Scan current website, safety status, threat warning, safe badge, scan history, settings link
  */
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Shield, ShieldCheck, ShieldAlert, AlertTriangle, RefreshCw,
   Clock, Settings, ExternalLink, Loader2, Lock, Calendar, Globe
@@ -203,7 +204,7 @@ const ExtensionPopup: React.FC = () => {
               }}>
                 <span style={{ fontSize: 12, color: hCfg.color, flexShrink: 0 }}>{hCfg.icon}</span>
                 <span style={{ flex: 1, fontSize: 12, color: "#cbd5e1", fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.domain}</span>
-                <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 99, background: hCfg.bg, color: hCfg.color, border: `1px solid ${hCfg.border}`, flexShrink: 0, fontSize: "10px" }}>{h.verdict}</span>
+                <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 99, background: hCfg.bg, color: hCfg.color, border: `1px solid ${hCfg.border}`, flexShrink: 0 }}>{h.verdict}</span>
                 <span style={{ fontSize: 10.5, color: "#334155", flexShrink: 0, display: "flex", alignItems: "center", gap: 3 }}><Clock size={10}/>{h.time}</span>
               </div>
             );
@@ -218,7 +219,7 @@ const ExtensionPopup: React.FC = () => {
         background: "rgba(255,255,255,.02)",
       }}>
         <span style={{ fontSize: 11, color: "#334155" }}>PhishGuard v2.3.1</span>
-        <a href="#" style={{ fontSize: 11, color: "#60a5fa", textDecoration: "none" }}>Open Dashboard →</a>
+        <Link to="/dashboard" style={{ fontSize: 11, color: "#60a5fa", textDecoration: "none" }}>Open Dashboard →</Link>
       </div>
 
       <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>

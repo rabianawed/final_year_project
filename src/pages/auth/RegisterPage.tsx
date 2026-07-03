@@ -5,10 +5,12 @@
  */
 
 import React, { useState, useMemo } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Shield, Mail, Lock, User, Eye, EyeOff, AlertCircle,
   ArrowRight, CheckCircle2, ShieldCheck, Zap, Link2, Mail as MailIcon
 } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -65,15 +67,6 @@ function validate(form: FormState): FormErrors {
   if (!form.agreeTerms) errs.agreeTerms = "You must agree to the Terms to continue.";
 
   return errs;
-}
-
-async function fakeRegister(form: FormState): Promise<{ success: boolean; message?: string }> {
-  await new Promise((r) => setTimeout(r, 1300));
-  // Simulate "email already exists" for demo purposes
-  if (form.email === "taken@phishguard.ai") {
-    return { success: false, message: "An account with this email already exists." };
-  }
-  return { success: true };
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -244,6 +237,8 @@ const StrengthMeter: React.FC<{ password: string }> = ({ password }) => {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 const RegisterPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { register } = useAuth();
   const [form, setForm] = useState<FormState>({
     fullName: "", email: "", password: "", confirmPassword: "", agreeTerms: false,
   });
@@ -263,12 +258,12 @@ const RegisterPage: React.FC = () => {
 
     setLoading(true);
     setErrors({});
-    const result = await fakeRegister(form);
+    const result = await register(form.fullName, form.email, form.password);
     setLoading(false);
 
     if (result.success) {
       setSuccess(true);
-      setTimeout(() => { window.location.href = "/dashboard"; }, 1400);
+      setTimeout(() => navigate("/dashboard"), 900);
     } else {
       setErrors({ general: result.message });
     }
@@ -449,9 +444,9 @@ const RegisterPage: React.FC = () => {
 
           <p style={{ textAlign: "center", color: "#475569", fontSize: 13 }}>
             Already have an account?{" "}
-            <a href="/login" style={{ color: "#60a5fa", textDecoration: "none", fontWeight: 500 }}>
+            <Link to="/login" style={{ color: "#60a5fa", textDecoration: "none", fontWeight: 500 }}>
               Sign in
-            </a>
+            </Link>
           </p>
         </div>
       </div>

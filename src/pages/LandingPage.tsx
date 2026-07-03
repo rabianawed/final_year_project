@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Shield, Zap, Eye, Globe, Mail, Link2, ChevronDown, ChevronRight,
   Check, Star, ArrowRight, Menu, X, Lock, Brain, BarChart3,
@@ -225,12 +226,12 @@ function useInView(threshold = 0.15) {
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 /** Glassmorphism card */
-const GlassCard: React.FC<{ children: React.ReactNode; className?: string }> = ({
-  children, className = ""
+const GlassCard: React.FC<{ children: React.ReactNode; className?: string; style?: React.CSSProperties }> = ({
+  children, className = "", style
 }) => (
   <div
     className={`rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm ${className}`}
-    style={{ boxShadow: "0 4px 32px rgba(0,0,0,0.3)" }}
+    style={{ boxShadow: "0 4px 32px rgba(0,0,0,0.3)", ...style }}
   >
     {children}
   </div>
@@ -299,7 +300,7 @@ const Navbar: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <a href="#" className="flex items-center gap-2.5 group">
+        <Link to="/" className="flex items-center gap-2.5 group">
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center"
             style={{ background: "linear-gradient(135deg, #2563EB, #7C3AED)" }}
@@ -309,7 +310,7 @@ const Navbar: React.FC = () => {
           <span className="text-white font-semibold text-lg tracking-tight">
             Phish<span className="text-blue-400">Guard</span>
           </span>
-        </a>
+        </Link>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
@@ -326,16 +327,16 @@ const Navbar: React.FC = () => {
 
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <a href="/login" className="text-slate-300 hover:text-white text-sm transition-colors px-4 py-2">
+          <Link to="/login" className="text-slate-300 hover:text-white text-sm transition-colors px-4 py-2">
             Sign in
-          </a>
-          <a
-            href="/register"
+          </Link>
+          <Link
+            to="/register"
             className="text-sm font-medium px-4 py-2 rounded-lg text-white transition-all"
             style={{ background: "#2563EB" }}
           >
             Get started
-          </a>
+          </Link>
         </div>
 
         {/* Mobile Toggle */}
@@ -361,10 +362,10 @@ const Navbar: React.FC = () => {
             </button>
           ))}
           <hr className="border-white/10" />
-          <a href="/login" className="text-slate-300 text-sm">Sign in</a>
-          <a href="/register" className="text-sm font-medium px-4 py-2 rounded-lg text-white text-center" style={{ background: "#2563EB" }}>
+          <Link to="/login" className="text-slate-300 text-sm">Sign in</Link>
+          <Link to="/register" className="text-sm font-medium px-4 py-2 rounded-lg text-white text-center" style={{ background: "#2563EB" }}>
             Get started
-          </a>
+          </Link>
         </div>
       )}
     </nav>
@@ -374,6 +375,7 @@ const Navbar: React.FC = () => {
 // ─── Section: Hero ───────────────────────────────────────────────────────────
 
 const Hero: React.FC = () => {
+  const navigate = useNavigate();
   const [inputVal, setInputVal] = useState("");
 
   /* Animated threat badges that float around the shield */
@@ -447,13 +449,20 @@ const Hero: React.FC = () => {
                   className="flex-1 bg-transparent text-white placeholder-slate-500 text-sm outline-none"
                 />
               </div>
-              <a
-                href="/dashboard/url-scanner"
+              <button
+                type="button"
+                onClick={() =>
+                  navigate(
+                    inputVal.trim()
+                      ? `/dashboard/url-scanner?q=${encodeURIComponent(inputVal.trim())}`
+                      : "/dashboard/url-scanner"
+                  )
+                }
                 className="flex items-center gap-2 px-5 py-3 rounded-xl text-white text-sm font-medium transition-all hover:opacity-90"
                 style={{ background: "#2563EB" }}
               >
                 Scan <ArrowRight size={15} />
-              </a>
+              </button>
             </div>
 
             <div className="flex items-center gap-6 text-sm text-slate-500">
@@ -824,8 +833,8 @@ const Pricing: React.FC = () => {
                 <p className="text-slate-400 text-sm">{plan.desc}</p>
               </div>
 
-              <a
-                href="/register"
+              <Link
+                to="/register"
                 className="block w-full text-center py-2.5 rounded-xl text-sm font-medium mb-6 transition-all"
                 style={
                   plan.highlight
@@ -834,7 +843,7 @@ const Pricing: React.FC = () => {
                 }
               >
                 {plan.cta}
-              </a>
+              </Link>
 
               <ul className="space-y-2.5">
                 {plan.features.map((f, j) => (
@@ -904,19 +913,19 @@ const CTABanner: React.FC = () => (
             Join thousands of security professionals using PhishGuard to stay one step ahead of attackers. Free forever. No credit card needed.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a
-              href="/register"
+            <Link
+              to="/register"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-medium transition-all hover:opacity-90"
               style={{ background: "#2563EB" }}
             >
               Create free account <ArrowRight size={16} />
-            </a>
-            <a
-              href="/dashboard"
+            </Link>
+            <Link
+              to="/dashboard"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-slate-300 font-medium border border-white/12 hover:border-white/24 transition-all"
             >
               View live demo
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -943,7 +952,13 @@ const Footer: React.FC = () => (
           </p>
           <div className="flex gap-3">
             {[Github, Twitter, Linkedin].map((Icon, i) => (
-              <a key={i} href="#" className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-white border border-white/8 hover:border-white/20 transition-all">
+              <a
+                key={i}
+                href={i === 0 ? "https://github.com/rabianawed/final_year_project" : "#"}
+                target={i === 0 ? "_blank" : undefined}
+                rel={i === 0 ? "noopener noreferrer" : undefined}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-white border border-white/8 hover:border-white/20 transition-all"
+              >
                 <Icon size={15} />
               </a>
             ))}
@@ -954,25 +969,42 @@ const Footer: React.FC = () => (
         {[
           {
             title: "Product",
-            links: ["URL Scanner", "Email Scanner", "Website Scanner", "Threat Intel", "Browser Extension"],
+            links: [
+              { label: "URL Scanner", to: "/dashboard/url-scanner" },
+              { label: "Email Scanner", to: "/dashboard/email-scanner" },
+              { label: "Website Scanner", to: "/dashboard/website-scanner" },
+              { label: "Threat Intel", to: "/dashboard/threat-intel" },
+              { label: "Browser Extension", to: "/extension" },
+            ],
           },
           {
             title: "Company",
-            links: ["About", "Blog", "Careers", "Press", "Contact"],
+            links: [
+              { label: "About", to: "/#features" },
+              { label: "Blog", to: "/#faq" },
+              { label: "Careers", to: "/register" },
+              { label: "Press", to: "/#testimonials" },
+              { label: "Contact", to: "/#pricing" },
+            ],
           },
           {
             title: "Legal",
-            links: ["Privacy Policy", "Terms of Service", "Cookie Policy", "Security"],
+            links: [
+              { label: "Privacy Policy", to: "/register" },
+              { label: "Terms of Service", to: "/register" },
+              { label: "Cookie Policy", to: "/register" },
+              { label: "Security", to: "/#how-it-works" },
+            ],
           },
         ].map((col) => (
           <div key={col.title}>
             <h4 className="text-white text-sm font-semibold mb-4">{col.title}</h4>
             <ul className="space-y-2.5">
               {col.links.map((link) => (
-                <li key={link}>
-                  <a href="#" className="text-slate-500 text-sm hover:text-slate-300 transition-colors">
-                    {link}
-                  </a>
+                <li key={link.label}>
+                  <Link to={link.to} className="text-slate-500 text-sm hover:text-slate-300 transition-colors">
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>

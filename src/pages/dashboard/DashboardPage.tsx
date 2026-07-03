@@ -5,6 +5,7 @@
  */
 
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   Link2, Mail, ShieldCheck, ShieldAlert, Target, Cpu,
   TrendingUp, TrendingDown, ArrowUpRight, Clock, AlertTriangle, CheckCircle2
@@ -163,19 +164,19 @@ const DashboardPage: React.FC = () => {
           <p style={{ color: "#64748b", fontSize: 13 }}>Real-time threat detection summary — last updated just now</p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <a href="/dashboard/url-scanner" style={{
+          <Link to="/dashboard/url-scanner" style={{
             display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", borderRadius: 10,
             background: "#2563EB", color: "#fff", fontSize: 13, fontWeight: 600, textDecoration: "none",
           }}>
             New Scan <ArrowUpRight size={14} />
-          </a>
-          <a href="/dashboard/reports" style={{
+          </Link>
+          <Link to="/dashboard/reports" style={{
             display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", borderRadius: 10,
             background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)",
             color: "#cbd5e1", fontSize: 13, fontWeight: 500, textDecoration: "none",
           }}>
             View Reports
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -256,7 +257,7 @@ const DashboardPage: React.FC = () => {
       <GlassCard style={{ padding: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
           <h3 style={{ color: "#f1f5f9", fontSize: 15, fontWeight: 600 }}>Recent Activity</h3>
-          <a href="/dashboard/reports" style={{ color: "#60a5fa", fontSize: 12.5, textDecoration: "none" }}>View all →</a>
+          <Link to="/dashboard/reports" style={{ color: "#60a5fa", fontSize: 12.5, textDecoration: "none" }}>View all →</Link>
         </div>
         <div>
           {RECENT_ACTIVITY.map((a, i) => <ActivityRow key={i} activity={a} />)}
