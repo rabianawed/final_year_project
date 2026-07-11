@@ -31,4 +31,4 @@ React 19 · TypeScript · Vite · Tailwind CSS · Recharts · Lucide Icons · Re
 Framer Motion · React Hook Form · Zod · TanStack Query
 
 ## Backend
-Connect to your FastAPI backend by setting VITE_API_URL in .env
+not connected yet
